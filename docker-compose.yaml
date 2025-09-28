@@ -1,0 +1,49 @@
+services:
+
+  db:
+    image: postgres
+    ports:
+      - 5435:5432
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: example
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: golang:1.25
+    working_dir: /app
+    command: sh -c "go mod download && go run ./cmd"
+    environment:
+      DATABASE_URL: postgres://postgres:example@db:5432/app?sslmode=disable
+    volumes:
+      - ./:/app
+    ports:
+      - 8080:8080
+    depends_on:
+      db:
+        condition: service_healthy
+
+  migrator:
+    image: migrate/migrate
+    volumes:
+      - ./migrations:/migrations:ro
+    environment:
+      DATABASE_URL: postgres://postgres:example@db:5432/app?sslmode=disable
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["migrate -path /migrations -database $${DATABASE_URL} up"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
