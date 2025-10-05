@@ -41,7 +41,7 @@ func (s *userService) CreateProfile(ctx context.Context, firstName, secondName s
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("CreateProfile called: firstName=%s, secondName=%s, birthdate=%s, biography=%s, city=%s, password=%s", firstName, secondName, birthdate, biography, city, password)
+	log.Printf("CreateProfile called: firstName=%s, secondName=%s, birthdate=%s, biography=%s, city=%s", firstName, secondName, birthdate, biography, city)
 	return s.users.CreateProfile(ctx, firstName, secondName, birthdate, biography, city, string(hash))
 }
 
