@@ -1,0 +1,127 @@
+{
+	"info": {
+		"_postman_id": "1101be85-d1d8-4abb-8f37-f4753ecd5987",
+		"name": "Social Network - Minimal",
+		"description": "Minimal collection for /login, /user/register, /user/get/{id}",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26333653"
+	},
+	"item": [
+		{
+			"name": "User - Register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"first_name\": \"Имя\",\n  \"second_name\": \"Фамилия\",\n  \"birthdate\": \"2017-02-01\",\n  \"biography\": \"Хобби, интересы и т.п.\",\n  \"city\": \"Москва\",\n  \"password\": \"Секретная строка\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"register"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Store user_id from register response in environment",
+							"try {",
+							"  const data = pm.response.json();",
+							"  if (data && data.user_id) { pm.environment.set(\"user_id\", data.user_id); }",
+							"} catch (e) { /* ignore parse errors */ }"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "Auth - Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"{{user_id}}\",\n  \"password\": \"Секретная строка\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Store token from login response in environment",
+							"try {",
+							"  const data = pm.response.json();",
+							"  if (data && data.token) { pm.environment.set(\"token\", data.token); }",
+							"} catch (e) { /* ignore parse errors */ }"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"response": []
+		},
+		{
+			"name": "User - Get by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/user/get/{{user_id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"get",
+						"{{user_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "user_id",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}

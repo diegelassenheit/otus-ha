@@ -2,12 +2,21 @@ package utils
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("your-secret-key") // In production, use environment variable
+var jwtSecret = []byte(getJWTSecret())
+
+func getJWTSecret() string {
+	if v := os.Getenv("JWT_SECRET"); v != "" {
+		return v
+	}
+	// Development fallback only; override in production via JWT_SECRET env var
+	return "dev-change-me"
+}
 
 type Claims struct {
 	UserID string `json:"user_id"`

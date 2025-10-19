@@ -49,15 +49,15 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := h.users.Login(c.Request.Context(), req.ID, req.Password)
+	u, err := h.users.Login(c.Request.Context(), req.ID, req.Password)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found or invalid password"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
-	token, err := utils.GenerateToken(user.ID)
+	token, err := utils.GenerateToken(u.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
 		return
 	}
 

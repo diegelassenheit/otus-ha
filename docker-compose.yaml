@@ -22,6 +22,7 @@ services:
     command: sh -c "go mod download && go run ./cmd"
     environment:
       DATABASE_URL: postgres://postgres:example@db:5432/app?sslmode=disable
+      JWT_SECRET: dev-change-me
     volumes:
       - ./:/app
     ports:

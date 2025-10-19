@@ -7,16 +7,25 @@ setup:
 	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 up:
-	docker compose -p ${PROJECT_NAME} -f $(COMPOSE_DEV) up --build -d
+	# Start all services (db, app, adminer) in the background
+	docker compose -p ${PROJECT_NAME} -f ${COMPOSE_DEV} up -d
 
 down:
-	docker compose -p ${PROJECT_NAME} -f $(COMPOSE_DEV) down
-
-run:
-	docker compose -p ${PROJECT_NAME} -f ${COMPOSE_DEV} up app -d
-
-test:
-	docker compose -p ${PROJECT_NAME} -f ${COMPOSE_DEV} exec app sh -c "go test ./internal/..."
+	# Stop all services and remove containers
+	docker compose -p ${PROJECT_NAME} -f ${COMPOSE_DEV} down
 
 migrate:
+	# Run migrations against a healthy db (one-off container)
 	docker compose -p ${PROJECT_NAME} -f ${COMPOSE_DEV} run --rm migrator
+
+db-up:
+	# Ensure database is up and healthy before migrations
+	docker compose -p ${PROJECT_NAME} -f ${COMPOSE_DEV} up -d db
+
+app-up:
+	# Start application and optional tools after migrations
+	docker compose -p ${PROJECT_NAME} -f ${COMPOSE_DEV} up -d app adminer
+
+check:
+	# Full check: setup tools, start db, run migrations, then start app
+	make setup && make db-up && make migrate && make app-up
